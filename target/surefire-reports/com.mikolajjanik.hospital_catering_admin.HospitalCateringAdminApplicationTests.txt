@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.mikolajjanik.hospital_catering_admin.HospitalCateringAdminApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.091 s -- in com.mikolajjanik.hospital_catering_admin.HospitalCateringAdminApplicationTests
