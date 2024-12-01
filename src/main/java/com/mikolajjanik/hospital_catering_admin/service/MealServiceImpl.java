@@ -37,6 +37,88 @@ public class MealServiceImpl implements MealService {
 
     @Override
     @SneakyThrows
+    public List<MealDTO> findPremiumMealsByDietIdAndType(Long dietId, String type) {
+        Diet diet = dietRepository.findDietById(dietId);
+
+        if (diet == null) {
+            throw new DietNotFoundException(dietId);
+        }
+
+        if (!(type.equals("breakfast") || type.equals("lunch") || type.equals("supper") || type.equals("all"))) {
+            throw new IncorrectTypeException();
+        }
+
+        String polishType = "";
+        List<Meal> meals = new ArrayList<>();
+
+        switch(type) {
+            case "breakfast" -> polishType = "śniadanie";
+            case "lunch" -> polishType = "obiad";
+            case "supper" -> polishType = "kolacja";
+            case "all" -> meals = mealRepository.findAllPremiumMealsByDietId(dietId);
+            default -> throw new IncorrectTypeException();
+        }
+
+        if (!type.equals("all")) {
+            meals = mealRepository.findPremiumMealsByDietIdAndType(dietId, polishType);
+        }
+
+        List<MealDTO> finalMeals = new ArrayList<>();
+
+        meals.forEach((meal) -> {
+            byte[] rawPicture = mealRepository.findPictureById(meal.getId());
+            finalMeals.add(new MealDTO(
+                    meal.getId(),
+                    meal.getDiet(),
+                    meal.getName(),
+                    meal.getDescription(),
+                    meal.getPrice(),
+                    meal.getType().toLowerCase(),
+                    meal.getCalories(),
+                    meal.getProtein(),
+                    meal.getCarbohydrates(),
+                    meal.getFats(),
+                    Base64.getEncoder().encodeToString(rawPicture)
+            ));
+        });
+
+        return finalMeals;
+    }
+
+    @Override
+    @SneakyThrows
+    public List<MealDTO> findPremiumMealsByDietIdAndKeyword(Long dietId, String keyword) {
+        Diet diet = dietRepository.findDietById(dietId);
+
+        if (diet == null) {
+            throw new DietNotFoundException(dietId);
+        }
+
+        List<Meal> meals = mealRepository.findPremiumMealsByDietIdAndKeyword(dietId, keyword);
+
+        List<MealDTO> finalMeals = new ArrayList<>();
+
+        meals.forEach((meal) -> {
+            byte[] rawPicture = mealRepository.findPictureById(meal.getId());
+            finalMeals.add(new MealDTO(
+                    meal.getId(),
+                    meal.getDiet(),
+                    meal.getName(),
+                    meal.getDescription(),
+                    meal.getPrice(),
+                    meal.getType().toLowerCase(),
+                    meal.getCalories(),
+                    meal.getProtein(),
+                    meal.getCarbohydrates(),
+                    meal.getFats(),
+                    Base64.getEncoder().encodeToString(rawPicture)
+            ));
+        });
+        return finalMeals;
+    }
+
+    @Override
+    @SneakyThrows
     public List<Meal> findMealsByDietIdAndType(Long dietId, String type) {
         Diet diet = dietRepository.findDietById(dietId);
 
@@ -46,7 +128,7 @@ public class MealServiceImpl implements MealService {
 
         return switch (type) {
             case "śniadanie", "obiad", "kolacja" -> {
-                yield mealRepository.findMealsByDietIdAndType(dietId, type);
+                yield mealRepository.findBasicMealsByDietIdAndType(dietId, type);
             }
             default -> throw new IncorrectTypeException();
         };

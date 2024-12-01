@@ -7,6 +7,7 @@ import com.mikolajjanik.hospital_catering_admin.entity.Diet;
 import com.mikolajjanik.hospital_catering_admin.entity.Meal;
 import com.mikolajjanik.hospital_catering_admin.service.MealService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,18 @@ public class MealController {
                                 @RequestParam("type") String type,
                                 Pageable pageable) {
         return mealService.findAll(dietId, type, pageable);
+    }
+
+    @GetMapping("/premium")
+    public ResponseEntity<List<MealDTO>> getPremiumMeals(@RequestParam("dietId") Long dietId, @RequestParam("type") String type) {
+        List<MealDTO> meals = mealService.findPremiumMealsByDietIdAndType(dietId, type);
+        return new ResponseEntity<>(meals, HttpStatus.OK);
+    }
+
+    @GetMapping("/premium/{id}")
+    public ResponseEntity<List<MealDTO>> getPremiumMealsByKeyword(@PathVariable("id") Long dietId, @RequestParam("name") String name) {
+        List<MealDTO> meals = mealService.findPremiumMealsByDietIdAndKeyword(dietId, name);
+        return new ResponseEntity<>(meals, HttpStatus.OK);
     }
 
     @GetMapping("/breakfasts")

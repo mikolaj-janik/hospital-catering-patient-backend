@@ -19,7 +19,13 @@ public interface MealRepository extends JpaRepository<Meal, Long> {
     Page<Meal> findMealsByDietIdAndTypeIgnoreCase(Long dietId, String type, Pageable pageable);
     Set<Meal> findMealsByDietId(Long id);
     @Query(value = "SELECT * FROM posiłek WHERE dietaid = :id AND rodzaj = :type AND cena = 0.00", nativeQuery = true)
-    List<Meal> findMealsByDietIdAndType(@Param("id") Long id, @Param("type") String type);
+    List<Meal> findBasicMealsByDietIdAndType(@Param("id") Long id, @Param("type") String type);
+    @Query(value = "SELECT * FROM posiłek WHERE dietaid = :id AND rodzaj = :type AND cena > 0.00 ORDER BY rodzaj DESC", nativeQuery = true)
+    List<Meal> findPremiumMealsByDietIdAndType(@Param("id") Long id, @Param("type") String type);
+    @Query(value = "SELECT * FROM posiłek WHERE dietaid = :id AND cena > 0.00 ORDER BY rodzaj DESC", nativeQuery = true)
+    List<Meal> findAllPremiumMealsByDietId(@Param("id") Long id);
+    @Query(value = "SELECT * FROM posiłek WHERE dietaid = :id AND nazwa ILIKE '%' || :keyword || '%' AND cena > 0.00 ORDER BY rodzaj DESC", nativeQuery = true)
+    List<Meal> findPremiumMealsByDietIdAndKeyword(@Param("id") Long id, @Param("keyword") String keyword);
     Page<Meal> findMealsByDietIdAndNameContainingIgnoreCase(Long id, String name, Pageable pageable);
     Page<Meal> findMealsByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseOrTypeContainingIgnoreCase(String name, String description, String type, Pageable pageable);
     @Query(value = "SELECT obraz FROM posiłek WHERE id = :id", nativeQuery = true)

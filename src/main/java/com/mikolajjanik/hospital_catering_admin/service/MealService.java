@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Set;
 
 public interface MealService {
+
+    List<MealDTO> findPremiumMealsByDietIdAndType(Long dietId, String type);
+    List<MealDTO> findPremiumMealsByDietIdAndKeyword(Long dietId, String keyword);
     List<Meal> findMealsByDietIdAndType(Long dietId, String type);
     Page<MealDTO> findAll(Long dietId, String type, Pageable pageable);
     Page<MealDTO> findMealsByDietId(Long id, Pageable pageable);
