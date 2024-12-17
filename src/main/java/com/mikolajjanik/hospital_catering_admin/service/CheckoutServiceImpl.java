@@ -5,13 +5,14 @@ import com.mikolajjanik.hospital_catering_admin.dao.MealRepository;
 import com.mikolajjanik.hospital_catering_admin.dao.OrderMealRepository;
 import com.mikolajjanik.hospital_catering_admin.dao.PatientRepository;
 import com.mikolajjanik.hospital_catering_admin.dto.CartItem;
-import com.mikolajjanik.hospital_catering_admin.dto.OrderDTO;
+import com.mikolajjanik.hospital_catering_admin.dto.NewOrderDTO;
 import com.mikolajjanik.hospital_catering_admin.dto.PaymentInfoDTO;
 import com.mikolajjanik.hospital_catering_admin.entity.Meal;
 import com.mikolajjanik.hospital_catering_admin.entity.Order;
 import com.mikolajjanik.hospital_catering_admin.entity.OrderMeal;
 import com.mikolajjanik.hospital_catering_admin.entity.Patient;
 import com.mikolajjanik.hospital_catering_admin.exception.MealNotFoundException;
+import com.mikolajjanik.hospital_catering_admin.exception.OrderAlreadyExistsException;
 import com.mikolajjanik.hospital_catering_admin.exception.PatientNotFoundException;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,10 +64,10 @@ public class CheckoutServiceImpl implements CheckoutService {
 
     @Override
     @SneakyThrows
-    public Order placeOrder(OrderDTO orderDTO) {
-        List<CartItem> cartItems = orderDTO.getCartItems();
+    public Order placeOrder(NewOrderDTO newOrderDTO) {
+        List<CartItem> cartItems = newOrderDTO.getCartItems();
         LocalDateTime date = LocalDateTime.now();
-        Long patientId = orderDTO.getPatient().getId();
+        Long patientId = newOrderDTO.getPatient().getId();
 
         Patient patient = patientRepository.findPatientById(patientId);
 
@@ -77,7 +79,7 @@ public class CheckoutServiceImpl implements CheckoutService {
 
         order.setPatient(patient);
         order.setOrderDate(date);
-        order.setTotalPrice(orderDTO.getTotalPrice());
+        order.setTotalPrice(newOrderDTO.getTotalPrice());
 
         order = checkoutRepository.save(order);
 
@@ -98,5 +100,26 @@ public class CheckoutServiceImpl implements CheckoutService {
         }
 
         return finalOrder;
+    }
+
+    @Override
+    @SneakyThrows
+    public void checkAddingToCardPossibility(Long mealId, String dateStr) {
+        LocalDate date = LocalDate.parse(dateStr);
+        Meal meal = mealRepository.findMealById(mealId);
+
+        if (meal == null) {
+            throw new MealNotFoundException(mealId);
+        }
+
+        String mealType = meal.getType();
+
+        List<OrderMeal> meals = orderMealRepository.findOrderMealsByDate(date);
+
+        for (OrderMeal mealItem: meals) {
+            if (mealItem.getMeal().getType().equals(mealType)) {
+                throw new OrderAlreadyExistsException();
+            }
+        }
     }
 }

@@ -29,13 +29,12 @@ public class Order {
     @Column(name = "data")
     private LocalDateTime orderDate;
 
+    @ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
     @JsonIgnore
-    @ManyToMany(cascade = { CascadeType.ALL })
     @JoinTable(
             name = "zamówienie_posiłek",
             joinColumns = { @JoinColumn(name = "zamówienieid") },
             inverseJoinColumns = { @JoinColumn(name = "posiłekid") }
     )
     private List<Meal> meals;
-
 }

@@ -1,6 +1,6 @@
 package com.mikolajjanik.hospital_catering_admin.controller;
 
-import com.mikolajjanik.hospital_catering_admin.entity.Order;
+import com.mikolajjanik.hospital_catering_admin.dto.OrderDTO;
 import com.mikolajjanik.hospital_catering_admin.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,8 +22,8 @@ public class OrderController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Order>> getOrdersByPatientId(@RequestParam("patientId") Long patientId) {
-        List<Order> orders = orderService.getOrdersByPatientId(patientId);
+    public ResponseEntity<List<OrderDTO>> getOrdersByPatientId(@RequestParam("patientId") Long patientId) {
+        List<OrderDTO> orders = orderService.getOrdersByPatientId(patientId);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 }

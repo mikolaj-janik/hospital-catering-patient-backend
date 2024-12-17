@@ -1,19 +1,25 @@
 package com.mikolajjanik.hospital_catering_admin.dto;
 
 import com.mikolajjanik.hospital_catering_admin.entity.Patient;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 public class OrderDTO {
-    @NotNull(message = "Field 'patient' cannot be null.")
+
+    private Long id;
     private Patient patient;
-
-    @NotNull(message = "Field 'totalPrice' cannot be null.")
     private double totalPrice;
+    private LocalDateTime orderDate;
+    private List<OrderItemDTO> orderItems;
 
-    @NotNull(message = "Field 'cartItems' cannot be null")
-    private List<CartItem> cartItems;
+    public OrderDTO(Long id, Patient patient, double totalPrice, LocalDateTime orderDate, List<OrderItemDTO> orderItems) {
+        this.id = id;
+        this.patient = patient;
+        this.totalPrice = totalPrice;
+        this.orderDate = orderDate;
+        this.orderItems = orderItems;
+    }
 }
